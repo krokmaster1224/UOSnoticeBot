@@ -1,0 +1,36 @@
+name: UOS Daily Notice Bot
+
+on:
+  schedule:
+    # UTC 기준 23:30 = 한국 시간(KST) 기준 다음날 오전 8시 30분
+    - cron: '30 23 * * *'
+  workflow_dispatch: # 내가 원할 때 수동으로 테스트 실행할 수 있는 버튼 활성화
+
+permissions:
+  contents: write
+
+jobs:
+  send-notice:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. 저장소 파일 불러오기
+        uses: actions/checkout@v4
+
+      - name: 2. 파이썬 설치하기
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 3. feedparser 설치 및 공지봇 실행
+        run: |
+          pip install feedparser
+          python uos_bot.py
+
+      - name: 4. 읽은 공지 기록장(seen_links.txt) 자동 업데이트 저장
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Action"
+          git add seen_links.txt || true
+          git diff --staged --quiet || git commit -m "Update seen_links.txt"
+          git push

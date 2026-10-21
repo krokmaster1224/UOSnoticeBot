@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UOS Notice Banner</title>
+<style>
+  :root {
+    --bg: #ffffff; --card: #f7f6f3; --text: #37352f; --sub: #787774;
+    --border: #e9e9e7; --accent: #2383e2; --new-bg: #e8f0fe;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #191919; --card: #202020; --text: #ffffffcf; --sub: #9b9b9b;
+      --border: #2f2f2f; --accent: #529cca; --new-bg: #1f3042;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+    background: var(--bg); color: var(--text); padding: 10px 14px;
+  }
+  .banner {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+  }
+  .header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; flex-wrap: wrap; gap: 8px;
+  }
+  .title-area { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .update-time { font-size: 11px; color: var(--sub); font-weight: 400; }
+  .tabs { display: flex; gap: 5px; flex-wrap: wrap; }
+  .tab {
+    background: var(--bg); border: 1px solid var(--border); color: var(--sub);
+    font-size: 11px; padding: 3px 9px; border-radius: 6px; cursor: pointer; transition: 0.15s;
+  }
+  .tab.active, .tab:hover {
+    background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600;
+  }
+  .list {
+    display: flex; flex-direction: column; gap: 6px;
+    max-height: 155px; overflow-y: auto; padding-right: 4px;
+  }
+  .notice-item {
+    display: flex; align-items: center; gap: 7px; font-size: 13px;
+    padding: 5px 8px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border);
+  }
+  .old-item { font-style: italic; opacity: 0.68; }
+  .badge {
+    font-size: 10px; padding: 2px 5px; border-radius: 4px; font-weight: 600; white-space: nowrap;
+  }
+  .badge.new { background: var(--new-bg); color: var(--accent); font-style: normal; }
+  .badge.old { background: var(--border); color: var(--sub); font-style: normal; }
+  .badge.kw { background: transparent; border: 1px solid var(--border); color: var(--sub); font-style: normal; }
+  .title {
+    color: var(--text); text-decoration: none; flex: 1;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .new-item .title { font-weight: 600; color: var(--accent); }
+  .title:hover { text-decoration: underline; }
+  .date { font-size: 11px; color: var(--sub); white-space: nowrap; font-style: normal; }
+</style>
+</head>
+<body>
+<div class="banner">
+  <div class="header">
+    <div class="title-area">
+      📢 시립대 맞춤 공지 <span class="update-time">(10.21 07:29 업데이트)</span>
+    </div>
+    <div class="tabs"><button class="tab active" onclick="filterKw('ALL', this)">전체</button><button class="tab" onclick="filterKw('신청', this)">신청</button><button class="tab" onclick="filterKw('모집', this)">모집</button><button class="tab" onclick="filterKw('인턴', this)">인턴</button></div>
+  </div>
+  <div class="list" id="notice-list">
+                <div class="notice-item new-item" data-kw="신청">
+                    <span class="badge new">NEW</span>
+                    <span class="badge kw">신청</span>
+                    <a href="https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9967&sort=12" target="_blank" class="title">[AI·SW융합교육원] 2027학년도 1학기 AI융합전공 소개 및 복수전공 신청 관련 안내</a>
+                    <span class="date">2026-10-19</span>
+                </div>
+                <div class="notice-item new-item" data-kw="신청">
+                    <span class="badge new">NEW</span>
+                    <span class="badge kw">신청</span>
+                    <a href="https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9966&sort=13" target="_blank" class="title">2027학년도 전과 신청 안내</a>
+                    <span class="date">2026-10-19</span>
+                </div>
+                <div class="notice-item new-item" data-kw="신청">
+                    <span class="badge new">NEW</span>
+                    <span class="badge kw">신청</span>
+                    <a href="https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9958&sort=23" target="_blank" class="title">[융합전공학부] 2027-1학기 통섭전공(＋AI융합전공) 복수전공 신청 및 2026-2 복수전공 전환 신청 안내</a>
+                    <span class="date">2026-10-12</span>
+                </div>
+                <div class="notice-item new-item" data-kw="모집">
+                    <span class="badge new">NEW</span>
+                    <span class="badge kw">모집</span>
+                    <a href="http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31686&sort=1" target="_blank" class="title">[평생교육원]PPT제작 보조 인력 모집</a>
+                    <span class="date">2026-10-21</span>
+                </div>
+                <div class="notice-item new-item" data-kw="모집">
+                    <span class="badge new">NEW</span>
+                    <span class="badge kw">모집</span>
+                    <a href="http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31682&sort=1" target="_blank" class="title">[의사소통교실] 2026학년도 2학기 인자한 멘토링(인간관계 및 자기돌봄 심리 서사) 수시 모집 안내</a>
+                    <span class="date">2026-10-20</span>
+                </div>
+                <div class="notice-item new-item" data-kw="모집">
+                    <span class="badge new">NEW</span>
+                    <span class="badge kw">모집</span>
+                    <a href="http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31680&sort=1" target="_blank" class="title">[인공지능혁신융합대학사업단] Microsoft 인공지능 국제인증자격증 교육과정(MS AI-901) 추가 교육생 모집(선착순)</a>
+                    <span class="date">2026-10-20</span>
+                </div>
+                <div class="notice-item new-item" data-kw="인턴">
+                    <span class="badge new">NEW</span>
+                    <span class="badge kw">인턴</span>
+                    <a href="http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31688&sort=1" target="_blank" class="title">[데이원컴퍼니] 전환형 인턴 채용 공고(~채용 시 마감)</a>
+                    <span class="date">2026-10-21</span>
+                </div></div>
+</div>
+<script>
+function filterKw(kw, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.notice-item').forEach(el => {
+    el.style.display = (kw === 'ALL' || el.dataset.kw === kw) ? 'flex' : 'none';
+  });
+}
+</script>
+</body>
+</html>

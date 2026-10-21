@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: write
+  pages: write      # 웹페이지 자동 배포 권한 추가
+  id-token: write   # 웹페이지 자동 배포 인증 추가
 
 jobs:
   send-notice:
@@ -29,10 +31,18 @@ jobs:
           pip install feedparser
           python uos_bot.py
 
-      - name: 4. 기록장(seen_links.txt) 및 배너 웹페이지(index.html) 업데이트 저장
+      - name: 4. 기록장(seen_links.txt) 및 배너(index.html) 저장
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Action"
           git add seen_links.txt index.html || true
           git diff --staged --quiet || git commit -m "Update notices and Notion banner"
           git push
+
+      - name: 5. GitHub Pages 웹사이트 즉시 반영하기
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+      - name: 6. 웹사이트 배포 완료
+        id: deployment
+        uses: actions/deploy-pages@v4

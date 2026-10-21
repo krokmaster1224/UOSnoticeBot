@@ -22,8 +22,8 @@ rss_urls = {
     "장학공지": "https://www.uos.ac.kr/rss/sBoard.do"
 }
 
-my_keywords = ["장학", "수강", "신청", "모집", "인턴", "공모전", "철학", "미디어", "졸업", "체험", "봉사", "행사"]
-MAX_PER_KEYWORD = 6
+my_keywords = ["장학", "수강", "신청", "모집", "인턴", "공모전", "철학", "미디어"]
+MAX_PER_KEYWORD = 5
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SEEN_FILE = os.path.join(BASE_DIR, "seen_links.txt")
@@ -50,7 +50,7 @@ def collect_notices():
     
     for category, url in rss_urls.items():
         feed = feedparser.parse(url)
-        for entry in feed.entries[:30]:
+        for entry in feed.entries[:50]:
             link = entry.link
             if link not in visited_in_run:
                 visited_in_run.add(link)
@@ -86,7 +86,7 @@ def build_email_html(categorized):
         return None
     today_str = datetime.now().strftime("%Y년 %m월 %d일")
     html = f"<h2>📢 서울시립대학교 키워드별 맞춤 공지 ({today_str})</h2>"
-    html += "<p style='font-size: 13px; color: #555;'>💡 <b>굵은 파란 글씨</b>는 새 공지이며, 하단의 <i>기울어진 회색 글씨</i>는 이전 공지입니다.</p><hr>"
+    html += "<p style='font-size: 13px; color: #555;'>💡 <b>굵은 파란 글씨</b>는 새 공지이며, 하단의 <i>기울어진 회색 글씨</i>는 이전 공지입니다. (키워드당 최대 5개)</p><hr>"
     
     for kw, items in categorized.items():
         kw_html = ""
@@ -106,13 +106,12 @@ def build_email_html(categorized):
                     <a href="{item['link']}" style="font-size: 14px; color: #666; text-decoration: none; font-style: italic;">{item['title']}</a>
                     <span style="font-size: 11px; color: #999;"> ({item['published']})</span>
                 </li>"""
-        html += f"<h3 style='margin-top: 18px; color: #333;'>🏷️ {kw}</h3><ul>{kw_html}</ul>"
+        html += f"<h3 style='margin-top: 18px; color: #333;'>🏷️ {kw} (최대 {MAX_PER_KEYWORD}개)</h3><ul>{kw_html}</ul>"
     return html
 
 def generate_notion_banner(categorized):
     today_str = datetime.now().strftime("%m.%d %H:%M 업데이트")
     
-    # 탭 버튼 및 리스트 아이템 생성
     tabs_html = '<button class="tab active" onclick="filterKw(\'ALL\', this)">전체</button>'
     items_html = ""
     
@@ -159,33 +158,33 @@ def generate_notion_banner(categorized):
   * {{ box-sizing: border-box; margin: 0; padding: 0; }}
   body {{
     font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
-    background: var(--bg); color: var(--text); padding: 10px 14px;
+    background: var(--bg); color: var(--text); padding: 12px 14px;
   }}
   .banner {{
     background: var(--card); border: 1px solid var(--border);
-    border-radius: 10px; padding: 12px 16px;
+    border-radius: 10px; padding: 16px 18px; /* 상단 베젤(여백)을 위아래로 넉넉하게 확장 */
   }}
   .header {{
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 10px; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 12px; flex-wrap: wrap; gap: 10px;
   }}
   .title-area {{ font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }}
   .update-time {{ font-size: 11px; color: var(--sub); font-weight: 400; }}
   .tabs {{ display: flex; gap: 5px; flex-wrap: wrap; }}
   .tab {{
     background: var(--bg); border: 1px solid var(--border); color: var(--sub);
-    font-size: 11px; padding: 3px 9px; border-radius: 6px; cursor: pointer; transition: 0.15s;
+    font-size: 11px; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: 0.15s;
   }}
   .tab.active, .tab:hover {{
     background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600;
   }}
   .list {{
     display: flex; flex-direction: column; gap: 6px;
-    max-height: 155px; overflow-y: auto; padding-right: 4px;
+    max-height: 220px; overflow-y: auto; padding-right: 4px;
   }}
   .notice-item {{
     display: flex; align-items: center; gap: 7px; font-size: 13px;
-    padding: 5px 8px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border);
+    padding: 6px 10px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border);
   }}
   .old-item {{ font-style: italic; opacity: 0.68; }}
   .badge {{
@@ -253,4 +252,4 @@ if __name__ == "__main__":
     generate_notion_banner(categorized_data)
     email_html = build_email_html(categorized_data)
     if email_html:
-        send_gmail(email_html)
+        send_gmail(html_body=email_html)

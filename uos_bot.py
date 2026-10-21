@@ -206,7 +206,7 @@ def generate_notion_banner(categorized):
 <div class="banner">
   <div class="header">
     <div class="title-area">
-      🏫 UOS ANNOUNCEMENT <span class="update-time">({today_str})</span>
+      📢 시립대 맞춤 공지 <span class="update-time">({today_str})</span>
     </div>
     <div class="tabs">{tabs_html}</div>
   </div>

@@ -22,8 +22,8 @@ rss_urls = {
     "장학공지": "https://www.uos.ac.kr/rss/sBoard.do"
 }
 
-my_keywords = ["장학", "수강", "신청", "모집", "인턴", "공모전", "철학", "미디어"]
-MAX_PER_KEYWORD = 3
+my_keywords = ["장학", "수강", "신청", "모집", "인턴", "공모전", "철학", "미디어", "졸업", "체험", "봉사", "행사"]
+MAX_PER_KEYWORD = 6
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SEEN_FILE = os.path.join(BASE_DIR, "seen_links.txt")

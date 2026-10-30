@@ -7,22 +7,24 @@
 <style>
   :root {
     --bg: #ffffff; --card: #f7f6f3; --text: #37352f; --sub: #787774;
-    --border: #e9e9e7; --accent: #2383e2; --new-bg: #e8f0fe;
+    --border: #e9e9e7; --accent: #2383e2; --new-bg: #e8f0fe; --star: #f5a623;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #191919; --card: #202020; --text: #ffffffcf; --sub: #9b9b9b;
-      --border: #2f2f2f; --accent: #529cca; --new-bg: #1f3042;
+      --border: #2f2f2f; --accent: #529cca; --new-bg: #1f3042; --star: #f5c518;
     }
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
-    background: var(--bg); color: var(--text); padding: 12px 14px;
+    background: var(--bg); color: var(--text);
+    /* 노션 상단 임베드 메뉴바에 버튼이 가려지지 않도록 상단 여백을 넉넉하게 확보 */
+    padding: 38px 14px 12px 14px;
   }
   .banner {
     background: var(--card); border: 1px solid var(--border);
-    border-radius: 10px; padding: 16px 18px; /* 상단 베젤(여백)을 위아래로 넉넉하게 확장 */
+    border-radius: 10px; padding: 16px 18px;
   }
   .header {
     display: flex; justify-content: space-between; align-items: center;
@@ -30,7 +32,7 @@
   }
   .title-area { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
   .update-time { font-size: 11px; color: var(--sub); font-weight: 400; }
-  .tabs { display: flex; gap: 5px; flex-wrap: wrap; }
+  .tabs { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
   .tab {
     background: var(--bg); border: 1px solid var(--border); color: var(--sub);
     font-size: 11px; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: 0.15s;
@@ -38,15 +40,28 @@
   .tab.active, .tab:hover {
     background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600;
   }
+  .refresh-btn {
+    background: var(--bg); border: 1px solid var(--border); color: var(--text);
+    font-size: 12px; padding: 3px 7px; border-radius: 6px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; transition: 0.2s;
+  }
+  .refresh-btn:hover { background: var(--border); }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+  .spinning { display: inline-block; animation: spin 0.8s linear infinite; }
   .list {
     display: flex; flex-direction: column; gap: 6px;
-    max-height: 220px; overflow-y: auto; padding-right: 4px;
+    max-height: 225px; overflow-y: auto; padding-right: 4px;
   }
   .notice-item {
     display: flex; align-items: center; gap: 7px; font-size: 13px;
     padding: 6px 10px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border);
   }
   .old-item { font-style: italic; opacity: 0.68; }
+  .star-btn {
+    background: none; border: none; cursor: pointer; font-size: 15px;
+    line-height: 1; color: var(--sub); padding: 0 2px; font-style: normal;
+  }
+  .star-btn.starred { color: var(--star); }
   .badge {
     font-size: 10px; padding: 2px 5px; border-radius: 4px; font-weight: 600; white-space: nowrap;
   }
@@ -55,85 +70,209 @@
   .badge.kw { background: transparent; border: 1px solid var(--border); color: var(--sub); font-style: normal; }
   .title {
     color: var(--text); text-decoration: none; flex: 1;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
   }
   .new-item .title { font-weight: 600; color: var(--accent); }
+  .old-item .title { color: var(--sub); font-style: italic; }
   .title:hover { text-decoration: underline; }
   .date { font-size: 11px; color: var(--sub); white-space: nowrap; font-style: normal; }
+  .empty { font-size: 12px; color: var(--sub); padding: 18px 0; text-align: center; }
 </style>
 </head>
 <body>
 <div class="banner">
   <div class="header">
     <div class="title-area">
-      📢 시립대 맞춤 공지 <span class="update-time">(10.29 23:56 업데이트)</span>
+      📢 시립대 맞춤 공지 <span class="update-time" id="update-time">(10.30 06:01 업데이트)</span>
     </div>
-    <div class="tabs"><button class="tab active" onclick="filterKw('ALL', this)">전체</button><button class="tab" onclick="filterKw('신청', this)">신청</button><button class="tab" onclick="filterKw('모집', this)">모집</button><button class="tab" onclick="filterKw('공모전', this)">공모전</button></div>
+    <div class="tabs" id="tabs-container"></div>
   </div>
-  <div class="list" id="notice-list">
-                <div class="notice-item new-item" data-kw="신청">
-                    <span class="badge new">NEW</span>
-                    <span class="badge kw">신청</span>
-                    <a href="https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9955&sort=14" target="_blank" class="title">2026학년도 제2학기 복수전공전환 신청 안내</a>
-                    <span class="date">2026-10-08</span>
-                </div>
-                <div class="notice-item new-item" data-kw="신청">
-                    <span class="badge new">NEW</span>
-                    <span class="badge kw">신청</span>
-                    <a href="https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9954&sort=15" target="_blank" class="title">2027학년도 제1학기 복수전공 신청 안내 (수정)</a>
-                    <span class="date">2026-10-08</span>
-                </div>
-                <div class="notice-item new-item" data-kw="신청">
-                    <span class="badge new">NEW</span>
-                    <span class="badge kw">신청</span>
-                    <a href="https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9967&sort=17" target="_blank" class="title">[AI·SW융합교육원] 2027학년도 1학기 AI융합전공 소개 및 복수전공·부전공 신청 관련 안내</a>
-                    <span class="date">2026-10-19</span>
-                </div>
-                <div class="notice-item new-item" data-kw="신청">
-                    <span class="badge new">NEW</span>
-                    <span class="badge kw">신청</span>
-                    <a href="https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9985&sort=19" target="_blank" class="title">[교직] 2027학년도 교직과정 복수전공 이수 신청 안내</a>
-                    <span class="date">2026-10-26</span>
-                </div>
-                <div class="notice-item new-item" data-kw="신청">
-                    <span class="badge new">NEW</span>
-                    <span class="badge kw">신청</span>
-                    <a href="https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9983&sort=21" target="_blank" class="title">2026학년도 제2학기 부전공전환 신청 안내</a>
-                    <span class="date">2026-10-23</span>
-                </div>
-                <div class="notice-item new-item" data-kw="모집">
-                    <span class="badge new">NEW</span>
-                    <span class="badge kw">모집</span>
-                    <a href="http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31762&sort=1" target="_blank" class="title">[법학전문대학원] 2027학년도 법학전문대학원 면접 및 구술고사 학생 근무자 모집 안내</a>
-                    <span class="date">2026-10-29</span>
-                </div>
-                <div class="notice-item old-item" data-kw="모집">
-                    <span class="badge old">이전</span>
-                    <span class="badge kw">모집</span>
-                    <a href="http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31752&sort=1" target="_blank" class="title">[캠퍼스타운] 2026년 AIX 실전 문제해결 프로젝트 2기 참여자 모집(~11.4.)</a>
-                    <span class="date">2026-10-28</span>
-                </div>
-                <div class="notice-item old-item" data-kw="모집">
-                    <span class="badge old">이전</span>
-                    <span class="badge kw">모집</span>
-                    <a href="http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31749&sort=1" target="_blank" class="title">❄️[현장실습지원센터] 2026학년도 겨울 계절수업 UOS현장실습 학생 모집</a>
-                    <span class="date">2026-10-28</span>
-                </div>
-                <div class="notice-item old-item" data-kw="공모전">
-                    <span class="badge old">이전</span>
-                    <span class="badge kw">공모전</span>
-                    <a href="http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31751&sort=1" target="_blank" class="title">2026 서울시립대 홍보 콘텐츠 공모전✨ 상금 최대 100만원! 참가자 전원 카페 쿠폰 증정🎁(~12/6까지)</a>
-                    <span class="date">2026-10-28</span>
-                </div></div>
+  <div class="list" id="notice-list"></div>
 </div>
+
 <script>
-function filterKw(kw, btn) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.notice-item').forEach(el => {
-    el.style.display = (kw === 'ALL' || el.dataset.kw === kw) ? 'flex' : 'none';
-  });
+const KEYWORDS = ["장학", "수강", "신청", "모집", "인턴", "공모전", "철학", "미디어"];
+const MAX_PER_KW = 5;
+const RSS_URLS = {"전체공지": "https://www.uos.ac.kr/rss/allBoard.do", "학사공지": "https://www.uos.ac.kr/rss/hBoard.do", "장학공지": "https://www.uos.ac.kr/rss/sBoard.do"};
+let rawNotices = [{"kw": "신청", "category": "전체공지", "title": "2026학년도 2학기 UOS 스타링크 교육과정 인증 신청 안내 : ~ 11.12", "link": "http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31746&sort=1", "published": "2026-10-28"}, {"kw": "신청", "category": "학사공지", "title": "2026학년도 제2학기 복수전공전환 신청 안내", "link": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9955&sort=15", "published": "2026-10-08"}, {"kw": "신청", "category": "학사공지", "title": "2027학년도 제1학기 복수전공 신청 안내 (수정)", "link": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9954&sort=16", "published": "2026-10-08"}, {"kw": "신청", "category": "학사공지", "title": "2027학년도 전과 신청 안내", "link": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9966&sort=17", "published": "2026-10-19"}, {"kw": "신청", "category": "학사공지", "title": "[AI·SW융합교육원] 2027학년도 1학기 AI융합전공 소개 및 복수전공·부전공 신청 관련 안내", "link": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9967&sort=18", "published": "2026-10-19"}, {"kw": "신청", "category": "학사공지", "title": "[교직] 2027학년도 교직과정 복수전공 이수 신청 안내", "link": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9985&sort=20", "published": "2026-10-26"}, {"kw": "신청", "category": "학사공지", "title": "2026학년도 제2학기 부전공전환 신청 안내", "link": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9983&sort=22", "published": "2026-10-23"}, {"kw": "신청", "category": "학사공지", "title": "2027학년도 제1학기 부전공 신청 안내", "link": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9982&sort=23", "published": "2026-10-23"}, {"kw": "모집", "category": "전체공지", "title": "[법학전문대학원] 2027학년도 법학전문대학원 면접 및 구술고사 학생 근무자 모집 안내", "link": "http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31762&sort=1", "published": "2026-10-29"}, {"kw": "모집", "category": "전체공지", "title": "[캠퍼스타운] 2026년 AIX 실전 문제해결 프로젝트 2기 참여자 모집(~11.4.)", "link": "http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31752&sort=1", "published": "2026-10-28"}, {"kw": "모집", "category": "전체공지", "title": "❄️[현장실습지원센터] 2026학년도 겨울 계절수업 UOS현장실습 학생 모집(⭐참여기관표 확인 가능⭐)", "link": "http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31749&sort=1", "published": "2026-10-28"}, {"kw": "공모전", "category": "전체공지", "title": "2026 서울시립대 홍보 콘텐츠 공모전✨ 상금 최대 100만원! 참가자 전원 카페 쿠폰 증정🎁(~12/6까지)", "link": "http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31751&sort=1", "published": "2026-10-28"}];
+let currentTab = 'ALL';
+
+// 1. 브라우저 로컬 저장소에서 읽은 글(클릭한 글) 및 즐겨찾기 목록 불러오기
+let clickedLinks = new Set(JSON.parse(localStorage.getItem('uos_clicked_links') || '[]'));
+let favoritesMap = JSON.parse(localStorage.getItem('uos_favorites_map') || '{}');
+
+function saveState() {
+  localStorage.setItem('uos_clicked_links', JSON.stringify([...clickedLinks]));
+  localStorage.setItem('uos_favorites_map', JSON.stringify(favoritesMap));
 }
+
+// 2. 공지 클릭 시 즉시 읽음(회색 기울임꼴 + 하단 이동) 처리
+function markAsRead(link) {
+  clickedLinks.add(link);
+  if (favoritesMap[link]) {
+    favoritesMap[link].read = true;
+  }
+  saveState();
+  setTimeout(renderList, 80);
+}
+
+// 3. 즐겨찾기 별표 토글 (영구 보관)
+function toggleStar(event, itemStr) {
+  event.stopPropagation();
+  const item = JSON.parse(decodeURIComponent(itemStr));
+  if (favoritesMap[item.link]) {
+    delete favoritesMap[item.link];
+  } else {
+    favoritesMap[item.link] = {
+      kw: item.kw || '즐겨찾기',
+      category: item.category || '공지',
+      title: item.title,
+      link: item.link,
+      published: item.published
+    };
+  }
+  saveState();
+  renderTabs();
+  renderList();
+}
+
+// 4. 상단 카테고리 버튼 및 새로고침 버튼 렌더링
+function renderTabs() {
+  const container = document.getElementById('tabs-container');
+  const favCount = Object.keys(favoritesMap).length;
+  let html = `<button class="tab ${currentTab === 'ALL' ? 'active' : ''}" onclick="switchTab('ALL')">전체</button>`;
+  html += `<button class="tab ${currentTab === 'FAV' ? 'active' : ''}" onclick="switchTab('FAV')">⭐ 즐겨찾기${favCount ? ' (' + favCount + ')' : ''}</button>`;
+  
+  KEYWORDS.forEach(kw => {
+    html += `<button class="tab ${currentTab === kw ? 'active' : ''}" onclick="switchTab('${kw}')">${kw}</button>`;
+  });
+  
+  html += `<button class="refresh-btn" id="refresh-btn" onclick="refreshLive()" title="지금 공지 다시 긁어오기"><span id="refresh-icon">🔄</span></button>`;
+  container.innerHTML = html;
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  renderTabs();
+  renderList();
+}
+
+// 5. 공지 리스트 렌더링 (안 읽은 새 글은 상단, 클릭한 글은 하단 배치)
+function renderList() {
+  const listEl = document.getElementById('notice-list');
+  let displayItems = [];
+
+  if (currentTab === 'FAV') {
+    // 즐겨찾기 탭: 날짜가 지나도 사라지지 않으며 공지 게시 날짜 최신순 정렬
+    displayItems = Object.values(favoritesMap).sort((a, b) => (b.published || '').localeCompare(a.published || ''));
+  } else {
+    const targetKws = currentTab === 'ALL' ? KEYWORDS : [currentTab];
+    targetKws.forEach(kw => {
+      const kwItems = rawNotices.filter(n => n.kw === kw);
+      // 아직 클릭하지 않은 글(새 글)과 이미 클릭한 글(이전 글) 분리
+      const unread = kwItems.filter(n => !clickedLinks.has(n.link));
+      const read = kwItems.filter(n => clickedLinks.has(n.link));
+      // 새 글을 먼저 위로 올리고, 이미 클릭한 글은 아래로 배치해 최대 개수만큼 표시
+      const combined = [...unread, ...read].slice(0, MAX_PER_KW);
+      displayItems.push(...combined);
+    });
+  }
+
+  if (displayItems.length === 0) {
+    listEl.innerHTML = `<div class="empty">${currentTab === 'FAV' ? '☆ 버튼을 눌러 중요한 공지를 즐겨찾기에 추가해 보세요.' : '현재 해당 키워드의 최근 공지가 없습니다.'}</div>`;
+    return;
+  }
+
+  listEl.innerHTML = displayItems.map(item => {
+    const isRead = clickedLinks.has(item.link);
+    const isStarred = !!favoritesMap[item.link];
+    const itemEncoded = encodeURIComponent(JSON.stringify(item));
+    
+    return `
+      <div class="notice-item ${isRead ? 'old-item' : 'new-item'}">
+        <button class="star-btn ${isStarred ? 'starred' : ''}" onclick="toggleStar(event, '${itemEncoded}')" title="즐겨찾기">${isStarred ? '⭐' : '☆'}</button>
+        <span class="badge ${isRead ? 'old' : 'new'}">${isRead ? '이전' : 'NEW'}</span>
+        <span class="badge kw">${item.kw}</span>
+        <a href="${item.link}" target="_blank" class="title" onclick="markAsRead('${item.link}')">${item.title}</a>
+        <span class="date">${item.published}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+// 6. 실시간 새로고침 (버튼 클릭 시 시립대 RSS를 즉시 다시 긁어옴)
+async function refreshLive() {
+  const icon = document.getElementById('refresh-icon');
+  const timeEl = document.getElementById('update-time');
+  icon.classList.add('spinning');
+  timeEl.textContent = '(공지 다시 불러오는 중...)';
+
+  try {
+    const fetchedEntries = [];
+    const visited = new Set();
+
+    for (const [category, url] of Object.entries(RSS_URLS)) {
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`;
+      const res = await fetch(apiUrl);
+      const data = await res.json();
+      if (data && data.items) {
+        data.items.forEach(entry => {
+          if (!visited.has(entry.link)) {
+            visited.add(entry.link);
+            const pubDate = (entry.pubDate || '').substring(0, 10);
+            fetchedEntries.push({
+              category: category,
+              title: entry.title,
+              link: entry.link,
+              published: pubDate
+            });
+          }
+        });
+      }
+    }
+
+    if (fetchedEntries.length > 0) {
+      const updatedNotices = [];
+      KEYWORDS.forEach(kw => {
+        fetchedEntries.forEach(item => {
+          if (item.title.includes(kw)) {
+            updatedNotices.push({
+              kw: kw,
+              category: item.category,
+              title: item.title,
+              link: item.link,
+              published: item.published
+            });
+          }
+        });
+      });
+      rawNotices = updatedNotices;
+      renderList();
+    } else {
+      // 외부 프록시 제한 시 GitHub Pages 최신 데이터 재호출
+      const pageRes = await fetch(window.location.pathname + '?t=' + Date.now(), { cache: 'no-store' });
+      if (pageRes.ok) {
+        window.location.reload();
+        return;
+      }
+    }
+
+    const now = new Date();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    timeEl.textContent = `(${mm}.${dd} ${hh}:${min} 실시간 갱신됨)`;
+  } catch (e) {
+    timeEl.textContent = '(새로고침 완료)';
+  } finally {
+    icon.classList.remove('spinning');
+  }
+}
+
+// 초기 실행
+renderTabs();
+renderList();
 </script>
 </body>
 </html>

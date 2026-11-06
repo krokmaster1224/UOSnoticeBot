@@ -43,6 +43,9 @@ http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31791&sort=1
 http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31792&sort=1
 http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31793&sort=1
 http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31794&sort=1
+http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31798&sort=1
+http://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31802&sort=1
+https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=10012&sort=1
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9954&sort=10
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9954&sort=13
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9954&sort=15
@@ -53,6 +56,7 @@ https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9954&sort=9
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9955&sort=12
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9955&sort=14
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9955&sort=15
+https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9955&sort=16
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9955&sort=2
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9955&sort=4
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9955&sort=8
@@ -71,6 +75,7 @@ https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9966&sort=17
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9966&sort=18
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9966&sort=6
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9967&sort=1
+https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9967&sort=10
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9967&sort=12
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9967&sort=13
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9967&sort=15
@@ -84,6 +89,7 @@ https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9967&sort=7
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9979&sort=1
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9979&sort=11
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9979&sort=14
+https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9979&sort=15
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9979&sort=3
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9979&sort=6
 https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=9979&sort=7
